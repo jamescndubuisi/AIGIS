@@ -1,0 +1,19 @@
+<div class="card" style="width: 18rem; margin: 5px">
+    {% if data.image %}
+        <img src="{{ data.image.url }}" class="card-img-top" alt="...">
+    {% endif %}
+ <img src="/static/images/map.png" class="card-img-top" alt="..." height="200px" width="200px">
+  <div class="card-body">
+    <h5 class="card-title">{{ data.title }}</h5>
+    <p class="card-text">{{ data.description | truncatewords:13 }}</p>
+{#    <p class="card-text"><i>₦</i> {{ data.price }}</p>#}
+{#    <p class="card-text"><i>$</i> {{ product.price }}</p>#}
+    <a href="{{ data.get_absolute_url }}" class="btn btn-primary">View Viz</a>
+{#   <form method="POST" action="{% url "add_to_cart"  %}" style="margin-left: 50%; margin-top: -15.5%">#}
+{#        {% csrf_token %}#}
+{#        <input type="hidden" name = "product_id" value="{{ product.id }}">#}
+{##}
+{#       <button type="submit" class="btn btn-success">Add to cart</button>#}
+{# </form>#}
+  </div>
+</div>

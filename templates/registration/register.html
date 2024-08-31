@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}
+{{ title }}
+{% endblock title %}
+
+{% block config %}
+<style>
+.form-control{
+    width: 60%;
+}
+</style>
+{% endblock %}
+
+{% block nav %}
+    <ul class="navbar-nav mr-auto">
+
+
+
+    </ul>
+    <ul class="navbar-nav my-2 my-lg-0">
+        <li class="nav-item">
+            <a class="nav-link" href="{% url 'log_in' %}">Login</a>
+        </li>
+    </ul>
+
+{% endblock %}
+{% block content %}
+    <h1>{{ title }}</h1>
+    <form method="post">
+    {% csrf_token %}
+    {{ form| crispy }}
+<br>
+    <button type="submit" class="btn btn-success">Submit</button>
+
+    </form>
+
+{% endblock content %}

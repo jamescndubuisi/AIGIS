@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% block title %}
+{{ title }}
+{% endblock title %}
+
+{% block config %}
+<style>
+#username{
+    width: 60%;
+}
+#password{
+    width: 60%;
+}
+</style>
+{%  endblock %}
+{% block nav %}
+
+    <ul class="navbar-nav mr-auto">
+    </ul>
+<ul class="navbar-nav my-2 my-lg-0">
+        <li class="nav-item">
+            <a class="nav-link" href="{% url 'register' %}">Register</a>
+        </li>
+    </ul>
+{% endblock %}
+{% block content %}
+    <h1>{{ title }}</h1>
+    {% for message in messages %}
+
+    <div class="alert alert-danger">
+        <a class="close" href="#" data-dismiss="alert">×</a>
+           {{ message }}
+    </div>
+
+{% endfor %}
+        <form method="POST">
+            {% csrf_token %}
+            {{ form | crispy}}
+            <br>
+        <button type="submit" class="btn btn-success"> Submit</button>
+        </form>
+{% endblock content %}

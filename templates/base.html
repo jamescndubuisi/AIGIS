@@ -1,0 +1,75 @@
+{% load static %}
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+        <meta charset="utf-8">
+        <meta name="description" content="{% block description %}{% endblock %}">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+{#        <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">#}
+                    {#  seo #}
+         <meta property="og:url" content="{% block og-url %}{% endblock %}" /> {# link to current page #}
+         <meta property="og:title" content="{% block og-title %}{% endblock %}" /> {# title of current page #}
+         <meta property="og:description" content="{% block og-description %}{% endblock %}"> {# description of current page 65 characters#}
+         <meta property="og:image" content="{% block og-image %}{% endblock %}">{# image of current page less than 300kb #}
+         <meta property="og:image:width" content="600" />
+         <meta property="og:image:height" content="600" />
+      <meta property="og:type" content="website" />
+  
+    <!-- Custom styles for this template -->
+          <link rel="shortcut icon" type="image/png" href="{% static 'favicon.ico' %}"/>
+          <link href="{% static 'css/manage.css' %}" rel="stylesheet">
+          <link href="{% static 'css/style.css' %}" rel="stylesheet">
+          <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+          <link href="{% static 'css/font-awesome.min.css' %}" rel="stylesheet">
+          <script src="{% static 'js/jquery.min.js' %}"></script>
+            <script src="{% static 'js/bootstrap.min.js' %}"></script>
+   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+      {% block config %}
+
+      {% endblock %}
+      <title> {% block title %} {% endblock %} </title>
+
+
+  </head>
+  <body>
+
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark" style="margin-top: -50px">
+      <a class="navbar-brand" href="{% url 'home' %}">AI GIS</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+              aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          {% block nav %}
+
+          {% endblock nav %}
+      </div>
+</nav>
+    <br/>
+
+  <div class="container">
+
+      {% block content %}
+<div class="text-center">
+
+  <h1>Hello</h1>
+</div>
+
+      {% endblock %}
+  </div>
+
+
+
+  <br/>
+  <center>
+      <footer id="footer" style="position: fixed;height: 30px;bottom: 0px;left: 0px;right: 0px;margin-bottom: 0px; color: white; background-color: #0c1312; opacity:0.8; z-index: 2000 ">
+          <small style="margin-top: -60px" >Copyright &copy; The Just - All Rights Reserved</small>
+         <a href="http://www.djangoproject.com/"><img src="https://www.djangoproject.com/m/img/badges/djangomade124x25.gif" border="0" alt="Made with Django." title="Made with Django." /></a>
+      </footer>
+  </center>
+    <!-- Optional JavaScript -->
+  </body>
+</html>

@@ -1,0 +1,119 @@
+{% extends "loggedin.html" %}
+{% load static %}
+
+{% block title %}
+{{ title }}
+{% endblock %}
+
+ {% block config %}
+
+      <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+   
+    <style>
+        #map { height: 500px; }
+        leaflet-popup-content-wrapper {
+            background-color: rgba(255, 255, 255, 0.8);
+            color: #333;
+            box-shadow: 0 3px 14px rgba(0,0,0,0.4);
+        }
+        .map-label {
+            background: rgba(255, 255, 255, 0.7);
+            border: none;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+            padding: 5px;
+            font-size: 12px;
+            font-weight: bold;
+            color: #333;
+            white-space: nowrap;
+        }
+    </style>
+{% endblock %}
+{% block content %}
+    <div class="row">
+        <div class="col">
+                <h1>{{ object.title }}</h1>
+
+
+            <p>Created:   {{ object.created | date:"M d, Y"}} ( about {{ object.created | timesince }} ago )</p>
+                 <p> Updated:  {{ object.modified | date:"M d, Y"}} ( about {{ object.modified | timesince }} ago )</p>
+             <h4>Description: </h4>
+                <p> {{ object.description | linebreaks }}</p>
+        </div>
+    </div>
+    <div>
+
+    <h1>GeoJSON Visualization</h1>
+
+<div id="map"></div>
+    <script>
+        var map = L.map('map').setView([0, 0], 2);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+
+        var geojsonData = {{ geojson_data|safe }};
+        {#L.geoJSON(geojsonData).addTo(map);#}
+        
+        function onEachFeature(feature, layer) {
+            if (feature.properties) {
+                var popupContent = "<div>";
+                for (var key in feature.properties) {
+                    popupContent += "<strong>" + key + ":</strong> " + feature.properties[key] + "<br>";
+                }
+                popupContent += "</div>";
+                layer.bindPopup(popupContent);
+            }
+
+            if (feature.properties && feature.properties.name) {
+                var labelIcon = L.divIcon({
+                    className: 'map-label',
+                    html: feature.properties.name
+                });
+
+                var labelLatLng;
+                if (feature.geometry.type === "Point") {
+                    labelLatLng = layer.getLatLng();
+                } else if (feature.geometry.type === "Polygon" || feature.geometry.type === "MultiPolygon") {
+                    labelLatLng = layer.getBounds().getCenter();
+                } else if (feature.geometry.type === "LineString" || feature.geometry.type === "MultiLineString") {
+                    var latlngs = layer.getLatLngs();
+                    labelLatLng = latlngs[Math.floor(latlngs.length / 2)];
+                }
+
+                if (labelLatLng) {
+                    L.marker(labelLatLng, { icon: labelIcon }).addTo(map);
+                }
+            }
+        }
+
+        L.geoJSON(geojsonData, {
+            onEachFeature: onEachFeature,
+            pointToLayer: function (feature, latlng) {
+                return L.circleMarker(latlng, {
+                    radius: 8,
+                    fillColor: "#ff7800",
+                    color: "#000",
+                    weight: 1,
+                    opacity: 1,
+                    fillOpacity: 0.8
+                });
+            }
+        }).addTo(map);
+       
+
+        // Fit the map to the GeoJSON bounds
+        var geoJsonLayer = L.geoJSON(geojsonData);
+        
+        
+        
+        map.fitBounds(geoJsonLayer.getBounds());
+        {#map.fitBounds(L.geoJSON(geojsonData).getBounds());#}
+    </script>
+
+
+
+    </div>
+
+{%  endblock %}

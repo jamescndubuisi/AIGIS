@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block title %}
+
+{% endblock title %}
+
+
+{% block nav %}
+ <ul class="navbar-nav mr-auto" >
+
+        <li class="nav-item">
+            <a class="nav-link" href="{% url 'list' %}"> <i class="fa fa-floppy-o">Data</i></a>
+        </li>
+         <li class="nav-item">
+                <a class="nav-link " href="{% url 'home' %}"><i class="fa fa-bar-chart"> Visualizations </i></a>
+         </li>
+         <li class="nav-item">
+                <a class="nav-link " href="{% url 'home' %}"><i class="fa fa-area-chart"> AI Analysis </i></a>
+         </li>
+        <li class="nav-item">
+                <a class="nav-link " href="{% url 'upload' %}"><i class="fa fa-upload"> Upload </i></a>
+         </li>
+
+        </ul>
+
+ <ul class="navbar-nav my-2 my-lg-0">
+ <form method="get" action="{% url "home"  %}">
+
+          <div class="input-group">
+    {#      <input type="search" name="q" class="form-control rounded" placeholder="Search" value="{{ request.GET.q }}" aria-label="Search"#}
+          <input type="search" name="q" class="form-control rounded" placeholder="Search" value="" aria-label="Search"
+            aria-describedby="search-addon" />
+          <button type="submit" class="btn btn-outline-primary"><i class="fa fa-search"></i></button>
+    </div>
+ </form>
+
+ </ul>
+
+    <ul class="navbar-nav my-2 my-lg-0">
+        <li class="nav-item">
+            <form method="post" action="{% url 'logout' %}">
+    {% csrf_token %}
+    <button type="submit" class="nav-link btn btn-danger">logout</button>
+</form>
+{#            <a class="nav-link" href="{% url 'logout' %}">Logout</a>#}
+        </li>
+    </ul>
+{% endblock %}
+{% block content %}
+
+{% endblock content %}

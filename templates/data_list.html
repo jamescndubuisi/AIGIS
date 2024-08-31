@@ -1,0 +1,32 @@
+{% extends "loggedin.html" %}
+{% load static %}
+{% block title %}
+{{ title }}
+{% endblock %}
+{% block content %}
+<div class="container">
+<div class="row">
+
+{% if search == True %}
+<div class="col-12">
+You searched for: {{ request.GET.q }}
+</div>
+{% endif %}
+     {% for datapoint in  object_list %}
+      <div class="col">
+
+       {% include "snippets/card.html" with data=datapoint %}
+      </div>
+
+
+    {% endfor %}
+
+</div>
+
+
+
+</div>
+
+
+
+{% endblock %}
