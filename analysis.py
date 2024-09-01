@@ -2,13 +2,14 @@ import geopandas as gpd
 import pandas as pd
 import numpy as np
 import google.generativeai as genai
+import ast
 
 from AIGIS import settings
 
 GOOGLE_API_KEY = settings.GOOGLE_API
 
 
-def analyze_geojson(geojson_path, focus_column, exclude_columns):
+def analyze_geojson(geojson_path, focus_column, exclude):
     # Load the GeoJSON data into a GeoDataFrame
     gdf = gpd.read_file(geojson_path)
 
@@ -27,12 +28,12 @@ def analyze_geojson(geojson_path, focus_column, exclude_columns):
 
     # Separate geometry column if it exists
     if 'geometry' in gdf.columns:
-        exclude_columns.append('geometry')
+        exclude.append('geometry')
         geometry = gdf['geometry']
-        gdf = gdf.drop(columns=exclude_columns)
+        gdf = gdf.drop(columns=exclude)
     else:
         geometry = None
-        gdf = gdf.drop(columns=exclude_columns)
+        gdf = gdf.drop(columns=exclude)
         print("Warning: No 'geometry' column found in the GeoDataFrame.")
 
     # Identify numeric columns
@@ -64,39 +65,15 @@ def analyze_geojson(geojson_path, focus_column, exclude_columns):
     return analysis, geometry
 
 
-def print_analysis(analysis_results, key_column):
-    for stat, result in analysis_results.items():
-        if isinstance(result, pd.Series):
-            pass
-            # print(f"{stat.capitalize()} values based on '{key_column}':")
-            # print(result.to_string())
-        else:
-            print(f"{stat}:")
-            print(result)
-        # print("\n")
-
-
-geojson_file_path = "data.geojson"
-key_column = 'ZipCode'
-exclude_columns = ['OBJECTID']
-
-try:
-    analysis_results, geometry = analyze_geojson(geojson_file_path, key_column, exclude_columns)
-    print_analysis(analysis_results, key_column)
-
-    # Optional: You can use the geometry for further spatial analysis if needed
-    if geometry is not None:
-        print(f"Geometry column is available for spatial analysis. Shape: {geometry.shape}")
-    else:
-        print("No geometry column found in the GeoDataFrame.")
-
-except Exception as e:
-    print(f"An error occurred: {str(e)}")
-
-
-def gemini_news_summarizer(data="", temperature=1, top_p=0.95, top_k=64, max_output_tokens=8192,
-                           response_mime_type="application/json", category="political"):
-    prompt = "Analyze and Summarize the following geo data, and provide a detailed analysis of the data. " \
+def gemini_analyzer(data, temperature=1, top_p=0.95, top_k=64, max_output_tokens=8192,
+                    response_mime_type="application/json"):
+    prompt = """Analyze and Summarize the following geo data, 
+                and provide a brief, interesting and rich analysis of the following data. 
+                
+                Using this JSON schema:
+                Analysis = {"summary": str}
+                Return a `Analysis`
+                """ + str(data)
 
     genai.configure(api_key=GOOGLE_API_KEY)
     # Create the model
@@ -139,7 +116,7 @@ def gemini_news_summarizer(data="", temperature=1, top_p=0.95, top_k=64, max_out
         ]
     )
 
-    response = chat_session.send_message(prompt + data)
+    response = chat_session.send_message(prompt)
 
     # punny_article = PunnyArticle.objects.create(
     #     title=article.title,
@@ -151,5 +128,42 @@ def gemini_news_summarizer(data="", temperature=1, top_p=0.95, top_k=64, max_out
     #
     # punny_article.save()
 
-    # print(response.text)
+    print(response)
     return response.text
+
+
+def print_analysis(analysis_output, key_column):
+    for stat, result in analysis_output.items():
+        if isinstance(result, pd.Series):
+            pass
+            # print(f"{stat.capitalize()} values based on '{key_column}':")
+            # print(result.to_string())
+        else:
+            print(f"{stat}:")
+            print(result)
+        # print("\n")
+
+
+geojson_file_path = "data.geojson"
+key_column = 'ZipCode'
+exclude_columns = ['OBJECTID']
+analysis_results = {}
+try:
+    analysis_results, geometry = analyze_geojson(geojson_file_path, key_column, exclude_columns)
+    print("Done with analysis")
+    print_analysis(analysis_results, key_column)
+    print("Done printing")
+
+    # Optional: You can use the geometry for further spatial analysis if needed
+    if geometry is not None:
+        print(f"Geometry column is available for spatial analysis. Shape: {geometry.shape}")
+    else:
+        print("No geometry column found in the GeoDataFrame.")
+
+except Exception as e:
+    print(f"An error occurred: {str(e)}")
+
+response = gemini_analyzer(data=analysis_results)
+response = ast.literal_eval(response)
+print(response)
+print(response["summary"])

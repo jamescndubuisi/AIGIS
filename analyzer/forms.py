@@ -16,15 +16,39 @@ class CreateUser(UserCreationForm):
 
     class Meta:
         model = User
-        fields = ("email","password1","password2")
+        fields = ("email", "password1", "password2")
 
 
 class UploadData(forms.ModelForm):
-    # file = forms.FileField(widget=forms.FileInput(attrs={"class": "form-control", "id": "file"}))
+    title = forms.CharField(
+        max_length=200,
+        widget=forms.TextInput(attrs={'placeholder': 'Enter title here'}),
+        help_text='Enter a descriptive title for the data.'
+    )
+    description = forms.CharField(
+        widget=forms.Textarea(attrs={'placeholder': 'Enter description here'}),
+        help_text='Provide a detailed description of the data.'
+    )
+    exclude = forms.CharField(
+        max_length=100,
+        required=False,
+        widget=forms.TextInput(attrs={'placeholder': 'Enter exclusions here separated with commas'}),
+        help_text='Specify any exclusions for the data.'
+    )
+    focus_column = forms.CharField(
+        max_length=100,
+        required=False,
+        widget=forms.TextInput(attrs={'placeholder': 'What is your column of interest?'}),
+        help_text='Specify the focus column for the data.'
+    )
+    data_file = forms.FileField(
+        widget=forms.FileInput(attrs={'placeholder': 'Upload data file'}),
+        help_text='Upload the data file.'
+    )
 
     class Meta:
         model = Data
-        exclude = ("user", "created", "updated")
+        exclude = ("user", "created", "updated", "analysis")
 
     def clean_data_file(self):
         data_file = self.cleaned_data.get('data_file')

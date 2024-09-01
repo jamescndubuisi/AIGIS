@@ -83,7 +83,11 @@ class Data(models.Model):
     description = models.TextField()
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
+    exclude = models.CharField(max_length=100, null=True, blank=True)
+    focus_column = models.CharField(max_length=100, null=True, blank=True)
     data_file = models.FileField(upload_to="data_files/")
+    analysis = models.TextField(null=True, blank=True)
+
 
     class Meta:
         verbose_name = _("Data")
