@@ -62,20 +62,23 @@ def analyze_geojson(geojson_path, focus_column, exclude):
     for col in numeric_columns:
         max_key = gdf[col].idxmax()
         min_key = gdf[col].idxmin()
-        analysis[f'{col}_highest'] = f"{focus_column}: {max_key} value: ({gdf[col].max()})"
-        analysis[f'{col}_lowest'] = f"{focus_column}: {min_key} value: ({gdf[col].min()})"
+        analysis[f'{col}_highest'] = f"{focus_column}: {max_key} value: {gdf[col].max()}"
+        analysis[f'{col}_lowest'] = f"{focus_column}: {min_key} value: {gdf[col].min()}"
 
     return analysis, geometry
 
 
 def gemini_analyzer(data, temperature=1, top_p=0.95, top_k=64, max_output_tokens=8192,
                     response_mime_type="application/json"):
+    print("task started : gemini analyzer function")
     prompt = """Analyze and Summarize the following geo data, 
                 and provide a brief, interesting and rich analysis of the following data. 
-
+                Also make logical predictions and explain your reasoning
                 Using this JSON schema:
-                Analysis = {"summary": str}
+                Analysis = {"summary": str,"prediction":str}
                 Return a `Analysis`
+                
+                
                 """ + str(data)
 
     genai.configure(api_key=GOOGLE_API_KEY)
@@ -121,11 +124,12 @@ def gemini_analyzer(data, temperature=1, top_p=0.95, top_k=64, max_output_tokens
 
     response = chat_session.send_message(prompt)
     print(response)
+    print("task done : gemini analyzer function")
     return response.text
 
 
 def print_analysis(analysis_output, key_column):
-    print("task started 3")
+    print("task started : print analysis function")
     for stat, result in analysis_output.items():
         if isinstance(result, pd.Series):
             pass
@@ -134,11 +138,12 @@ def print_analysis(analysis_output, key_column):
         else:
             print(f"{stat}:")
             print(result)
+    print("task done : print analysis function")
         # print("\n")
 
 
 def analyse_file(filename, focus_column, exclude_columns, model_id):
-    print("task started 2")
+    print("task started : analyse file function")
     geojson_file_path = filename
     # key_column = 'ZipCode'
     key_column = focus_column
@@ -164,14 +169,15 @@ def analyse_file(filename, focus_column, exclude_columns, model_id):
     response = ast.literal_eval(response)
     print(response)
     print(response["summary"])
+    print(response["prediction"])
     data_instance = Data.objects.get(id=model_id)
     data_instance.analysis = response["summary"]
     data_instance.save()
-    print("task started 5")
+    print("task done : analyse file function")
     return response["summary"]
 
 
 @shared_task
 def process_file(filename, focus_column, exclude_columns, model_id):
-    print("task started 1")
+    print("task started : process file function")
     return analyse_file(filename, focus_column, exclude_columns, model_id)
