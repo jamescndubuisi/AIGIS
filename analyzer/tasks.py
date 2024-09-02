@@ -12,6 +12,7 @@ GOOGLE_API_KEY = settings.GOOGLE_API  # Import your function
 
 
 def analyze_geojson(geojson_path, focus_column, exclude):
+    print("task started 4")
     # Load the GeoJSON data into a GeoDataFrame
     gdf = gpd.read_file(geojson_path)
 
@@ -124,6 +125,7 @@ def gemini_analyzer(data, temperature=1, top_p=0.95, top_k=64, max_output_tokens
 
 
 def print_analysis(analysis_output, key_column):
+    print("task started 3")
     for stat, result in analysis_output.items():
         if isinstance(result, pd.Series):
             pass
@@ -136,6 +138,7 @@ def print_analysis(analysis_output, key_column):
 
 
 def analyse_file(filename, focus_column, exclude_columns, model_id):
+    print("task started 2")
     geojson_file_path = filename
     # key_column = 'ZipCode'
     key_column = focus_column
@@ -164,10 +167,11 @@ def analyse_file(filename, focus_column, exclude_columns, model_id):
     data_instance = Data.objects.get(id=model_id)
     data_instance.analysis = response["summary"]
     data_instance.save()
-
+    print("task started 5")
     return response["summary"]
 
 
 @shared_task
 def process_file(filename, focus_column, exclude_columns, model_id):
+    print("task started 1")
     return analyse_file(filename, focus_column, exclude_columns, model_id)

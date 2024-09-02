@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'analyzer.apps.AnalyzerConfig',
     "crispy_forms",
     "crispy_bootstrap5",
+    "django_celery_results",
 ]
 
 MIDDLEWARE = [
@@ -165,8 +166,20 @@ CELERY_TASK_TIME_LIMIT = 30 * 60
 
 CELERY_BROKER_URL = 'amqp://localhost'
 # CELERY_BROKER_URL = 'amqp://localhost'
+CELERY_RESULT_BACKEND = 'django-db'
+CELERY_CACHE_BACKEND = 'django-cache'
+
+# CELERY_CACHE_BACKEND = 'default'
+#
+# # django setting.
+# CACHES = {
+#     'default': {
+#         'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
+#         'LOCATION': 'my_celery_cache_table',
+#     }
+# }
 
 
-# celery -A AIGIS.celery worker -l info
+# celery -A AIGIS.celery worker -l info -P eventlet
 
 

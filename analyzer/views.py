@@ -256,9 +256,11 @@ def upload_data(request):
             #                                       exclude_columns=exclusion_list)
 
             uploaded_file.save()
-
-            process_file.delay(filename=uploaded_file.data_file.path, focus_column=focus_column,
+            print("Before task")
+            task = process_file.delay(filename=uploaded_file.data_file.path, focus_column=focus_column,
                                exclude_columns=exclusion_list, model_id=uploaded_file.id)
+            print(task.id)
+            print("task started")
 
             # uploaded_file.save()
             # return render(request, 'index.html')
