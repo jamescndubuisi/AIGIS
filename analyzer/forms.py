@@ -61,11 +61,12 @@ class UploadData(forms.ModelForm):
             # if not data_file.name.endswith('.pdf'):
             #     raise forms.ValidationError("Only PDF files are allowed.")
 
-            valid_extensions = ['geojson', 'shp', 'shx', 'dbf']
+            # valid_extensions = ['geojson', 'shp', 'shx', 'dbf']
+            valid_extensions = ['geojson']
             file_extension = data_file.name.split('.')[-1].lower()
             print(file_extension)
             if file_extension not in valid_extensions:
-                raise forms.ValidationError("The file must be geojson or shapefiles.")
+                raise forms.ValidationError("The file must be a geojson file.")
 
         return data_file
 
