@@ -84,23 +84,23 @@ def gemini_analyzer(data, temperature=1, top_p=0.95, top_k=64, max_output_tokens
                     response_mime_type="application/json", data_description=""):
     prompt = """
                 Instruction:
-                Generate insightful analysis and summary, and make predictions the following geo data. 
-                Provide an interesting and rich analysis of the following data. 
-                Also make logical predictions and explain your reasoning
-                important: ignore statistics that don't make sense, like maximum mean median and mode of columns like phone 
-                number, house address number and the likes ignore phone number statistics in predictions and summary, 
-                use more meaningful statistics.
-                try figuring out what abbreviations mean and figure out other relevant information like
-                like postcode and zip codes based on geological knowledge.
-                Ignore mentioning data you do not consider useful.  
+                    Generate insightful analysis and summary, and make predictions the following geo data. 
+                    Provide an interesting and rich analysis of the following data. 
+                    Also make logical predictions and explain your reasoning
+                    important: ignore statistics that don't make sense, like maximum mean median and mode of columns like phone 
+                    number, house address number and the likes ignore phone number statistics in predictions and summary, 
+                    use more meaningful statistics.
+                    try figuring out what abbreviations mean and figure out other relevant information like
+                    like postcode and zip codes based on geological knowledge.
+                    Ignore mentioning data you do not consider useful.  
 
-                Avoid stating very obvious facts 
+                    Avoid stating very obvious facts 
 
 
-                Using this JSON schema:
-                ensure to follow this output format 
-                Analysis = {"summary": str,"prediction":str}
-                Return a `Analysis`
+                    Using this JSON schema:
+                    ensure to follow this output format 
+                    {"summary": str,"prediction":str}
+                    Return {"summary": str,"prediction":str}
 
             """ + str(data) + f"""Data Description: {data_description} """
 
@@ -405,16 +405,26 @@ def run_analysis_sync(geojson_file_path, key_column, exclude_columns, descriptio
         else:
             print("No geometry column found in the GeoDataFrame.")
 
+        status = "Completed"
+
+    except Exception as e:
+        analysis_results = []
+        print(f"An error occurred: {str(e)}")
+        status = "Failed"
+
+        # Send data to Gemini for analysis
+    try:
+        response = gemini_analyzer(data=analysis_results, data_description=description)
+        response = ast.literal_eval(response)
+        # print(response)
+        print(response["summary"])
+        print(response["prediction"])
     except Exception as e:
         print(f"An error occurred: {str(e)}")
+        response = {}
+        status = "Failed"
 
-    response = gemini_analyzer(data=analysis_results, data_description=description)
-    response = ast.literal_eval(response)
-    # print(response)
-    print(response["summary"])
-    print(response["prediction"])
-
-    return response["summary"], response["prediction"]
+    return response["summary"], response["prediction"], status
 
 
 @login_required
@@ -434,12 +444,15 @@ def upload_data(request):
                 exclusion_list = []
             focus_column = form.cleaned_data['focus_column']
             description = form.cleaned_data['description']
+
             uploaded_file = form.save(commit=False)
             uploaded_file.user = request.user
+            uploaded_file.analysis_status = "In Progress"
 
             if settings.SYNC:
-                uploaded_file.analysis, uploaded_file.prediction = run_analysis_sync(request.FILES.get('data_file'),
-                                                                    focus_column, exclusion_list, description)
+                uploaded_file.analysis, uploaded_file.prediction, analysis_state = run_analysis_sync(request.FILES.get('data_file'),
+                                                                   focus_column, exclusion_list, description)
+                uploaded_file.analysis_status = analysis_state
                 uploaded_file.save()
             else:
                 uploaded_file.save()

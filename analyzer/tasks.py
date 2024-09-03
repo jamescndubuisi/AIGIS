@@ -17,11 +17,6 @@ def analyze_geojson1(geojson_path, focus_column, exclude):
     # Load the GeoJSON data into a GeoDataFrame
     gdf = gpd.read_file(geojson_path)
 
-    # Print columns for debugging
-    # print("Columns in the GeoDataFrame:")
-    # print(gdf.columns)
-    # print(f"Key column: {focus_column}")
-
     # Check if the key column exists in the GeoDataFrame
     if focus_column not in gdf.columns:
         raise ValueError(f"Column '{focus_column}' not found in the GeoDataFrame.")
@@ -84,13 +79,7 @@ def analyze_geojson(geojson_path, key_column, exclude):
     if gdf.index.name != key_column:
         gdf = gdf.set_index(key_column)
 
-    # Separate geometry column if it exists
-    # if 'geometry' in gdf.columns:
-    #     geometry = gdf['geometry']
-    #     gdf = gdf.drop(columns=['geometry'])
-    # else:
-    #     geometry = None
-    #     print("Warning: No 'geometry' column found in the GeoDataFrame.")
+
     if 'geometry' in gdf.columns:
         exclude.append('geometry')
         geometry = gdf['geometry']
@@ -194,8 +183,9 @@ def gemini_analyzer(data, temperature=1, top_p=0.95, top_k=64, max_output_tokens
 
                     Using this JSON schema:
                     ensure to follow this output format 
-                    Analysis = {"summary": str,"prediction":str}
-                    Return a `Analysis`
+                    {"summary": str,"prediction":str}
+                    Return {"summary": str,"prediction":str}
+                    
 
                 """ + str(data) + f"""Data Description: {data_description} """
 
@@ -279,18 +269,31 @@ def analyse_file(filename, focus_column, exclude_columns, model_id, description)
             print(f"Geometry column is available for spatial analysis. Shape: {geometry.shape}")
         else:
             print("No geometry column found in the GeoDataFrame.")
+        status = "Completed"
 
     except Exception as e:
         print(f"An error occurred: {str(e)}")
+        status = "Failed"
 
-    response = gemini_analyzer(data=analysis_results, data_description=description)
-    response = ast.literal_eval(response)
+    try:
+        response = gemini_analyzer(data=analysis_results, data_description=description)
+        response = ast.literal_eval(response)
+        status = "Completed"
+    except Exception as e:
+        print(f"An error occurred: {str(e)}")
+        response = None
+        status = "Failed"
     print(response)
-    print(response["summary"])
+    # print(response["summary"])
+
+
+
+
     print(response["prediction"])
     data_instance = Data.objects.get(id=model_id)
     data_instance.analysis = response["summary"]
     data_instance.prediction = response["prediction"]
+    data_instance.analysis_status = status
     data_instance.save()
     print("task done : analyse file function")
     return response["summary"]

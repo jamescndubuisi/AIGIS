@@ -78,6 +78,12 @@ class User(AbstractUser):
 
 
 class Data(models.Model):
+    ANALYSIS_STATUS = (
+        ("Failed", "Failed"),
+        ("In Progress", "In Progress"),
+        ("Completed", "Completed"),
+
+    )
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     title = models.CharField(max_length=200)
     description = models.TextField()
@@ -88,6 +94,7 @@ class Data(models.Model):
     data_file = models.FileField(upload_to="data_files/")
     analysis = models.TextField(null=True, blank=True)
     prediction = models.TextField(null=True, blank=True)
+    analysis_status = models.CharField(max_length=20, default="In Progress", choices=ANALYSIS_STATUS)
 
     class Meta:
         verbose_name = _("Data")

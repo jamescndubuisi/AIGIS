@@ -47,7 +47,7 @@ class UploadData(forms.ModelForm):
 
     class Meta:
         model = Data
-        exclude = ("user", "created", "updated", "analysis","prediction")
+        exclude = ("user", "created", "updated", "analysis","prediction", "analysis_status")
 
     def clean_data_file(self):
         data_file = self.cleaned_data.get('data_file')
@@ -99,7 +99,7 @@ class EditData(forms.ModelForm):
 
     class Meta:
         model = Data
-        exclude = ("user", "created", "updated", "analysis","prediction","data_file", "exclude", "focus_column")
+        exclude = ("user", "created", "updated", "analysis","prediction","data_file", "exclude", "focus_column", "analysis_status")
 
     def clean_data_file(self):
         data_file = self.cleaned_data.get('data_file')
