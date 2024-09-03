@@ -451,29 +451,13 @@ def upload_data(request):
                 print(task.id)
                 print("task started")
 
-            # uploaded_file.save()
-            # print("Before task")
-            # task = process_file.delay(filename=uploaded_file.data_file.path, focus_column=focus_column,
-            #                           exclude_columns=exclusion_list, model_id=uploaded_file.id, description=description
-            #                           )
-            # print(task.id)
-            # print("task started")
-
-
-
-            # uploaded_file.save()
-            # return render(request, 'index.html')
-            # result = analyse_file(filename=request.FILES, focus_column='ZipCode', exclude_columns=['OBJECTID'])
-            # instance = Data.objects.get(id=uploaded_file.id)
-            # instance.analysis = result
-            # instance.save()
             return redirect("list")
     context['form'] = form
     return render(request, 'upload.html', context)
 
 
 class DataListView(ListView):
-    queryset = Data.objects.all()
+    queryset = Data.objects.all().order_by('-updated')
     template_name = 'data_list.html'
 
     def get_context_data(self, *args, **kwargs):
@@ -511,17 +495,6 @@ class DataUpdateView(UpdateView):
         return context
 
 
-# class DataDeleteView(DeleteView):
-#     model = Data
-#     template_name = 'upload.html'
-#     form_class = EditData
-#
-#     def get_context_data(self, *args, **kwargs):
-#         context = super(DataDeleteView, self).get_context_data(**kwargs)
-#         context['title'] = "Delete Data"
-#         context['search'] = False
-#         return context
-
 class DataDeleteView(DeleteView):
     model = Data
     template_name = 'delete_data.html'
@@ -533,5 +506,4 @@ class DataDeleteView(DeleteView):
         context['search'] = False
         return context
 
-    # def get_form(self, form_class=None):
-    #     return EditData(instance=self.object)
+
