@@ -9,6 +9,8 @@
 {#    <p class="card-text"><i>₦</i> {{ data.price }}</p>#}
 {#    <p class="card-text"><i>$</i> {{ product.price }}</p>#}
     <a href="{{ data.get_absolute_url }}" class="btn btn-primary">View Viz</a>
+    <a href="update/{{ data.id }}" class="btn btn-warning">Edit</a>
+    <a href="delete/{{ data.id }}" class="btn btn-danger">Delete</a>
 {#   <form method="POST" action="{% url "add_to_cart"  %}" style="margin-left: 50%; margin-top: -15.5%">#}
 {#        {% csrf_token %}#}
 {#        <input type="hidden" name = "product_id" value="{{ product.id }}">#}

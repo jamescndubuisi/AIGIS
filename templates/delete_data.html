@@ -1,0 +1,49 @@
+{% extends "loggedin.html" %}
+{% load static %}
+{% block title %}
+{{ title }}
+{% endblock %}
+{% block content %}
+<div class="container">
+    <div class="row">
+
+    {% if search == True %}
+    <div class="col-12">
+    You searched for: {{ request.GET.q }}
+    </div>
+{% endif %}
+    <div class="row">
+       <div class="col" >
+        <p>Are you sure you want to delete this data?</p>
+        <p><strong>Title:</strong> {{ object.title }}</p>
+        <p><strong>Description:</strong> {{ object.description }}</p>
+        <p><strong>Created:</strong> {{ object.created }}</p>
+    </div>
+
+    </div>
+
+<div class="row">
+    <div class="col">
+         <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+
+    <input type="submit" value="Confirm Delete" class="btn btn-danger">
+<a href="{% url 'list' %}" class="btn btn-primary">Cancel</a></form>
+
+
+    </div>
+
+
+</div>
+
+
+</div>
+
+
+
+</div>
+
+
+
+{% endblock %}

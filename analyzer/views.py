@@ -9,10 +9,11 @@ from django.contrib import messages
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
-from django.views.generic import ListView, DetailView
+from django.urls import reverse_lazy
+from django.views.generic import ListView, DetailView, UpdateView, DeleteView
 
 from AIGIS import settings
-from .forms import LoginForm, CreateUser, UploadData
+from .forms import LoginForm, CreateUser, UploadData, EditData
 from .models import Data
 from .tasks import process_file
 
@@ -241,12 +242,15 @@ def upload_data(request):
     if request.method == "POST":
         if form.is_valid():
             exclude = form.cleaned_data['exclude']
-            exclusion_list = exclude.split(",")
+            if exclude:
+                exclusion_list = exclude.split(",")
 
-            # Remove any leading or trailing whitespace from each word
-            exclusion_list = [word.strip() for word in exclusion_list]
+                # Remove any leading or trailing whitespace from each word
+                exclusion_list = [word.strip() for word in exclusion_list]
+            else:
+                exclusion_list = []
             focus_column = form.cleaned_data['focus_column']
-            # email = form.cleaned_data['email']
+            description = form.cleaned_data['description']
             uploaded_file = form.save(commit=False)
             uploaded_file.user = request.user
             # uploaded_file.analysis = analyse_file(filename=request.FILES['data_file'],
@@ -258,7 +262,8 @@ def upload_data(request):
             uploaded_file.save()
             print("Before task")
             task = process_file.delay(filename=uploaded_file.data_file.path, focus_column=focus_column,
-                               exclude_columns=exclusion_list, model_id=uploaded_file.id)
+                                      exclude_columns=exclusion_list, model_id=uploaded_file.id, description=description
+                                      )
             print(task.id)
             print("task started")
 
@@ -298,3 +303,41 @@ class DataDetailView(DetailView):
 
         context['geojson_data'] = json.dumps(geojson_data)
         return context
+
+
+class DataUpdateView(UpdateView):
+    model = Data
+    template_name = 'upload.html'
+    form_class = EditData
+
+    def get_context_data(self, *args, **kwargs):
+        context = super(DataUpdateView, self).get_context_data(**kwargs)
+        context['title'] = "Data Update"
+        context['search'] = False
+        return context
+
+
+# class DataDeleteView(DeleteView):
+#     model = Data
+#     template_name = 'upload.html'
+#     form_class = EditData
+#
+#     def get_context_data(self, *args, **kwargs):
+#         context = super(DataDeleteView, self).get_context_data(**kwargs)
+#         context['title'] = "Delete Data"
+#         context['search'] = False
+#         return context
+
+class DataDeleteView(DeleteView):
+    model = Data
+    template_name = 'delete_data.html'
+    success_url = reverse_lazy('list')  # Redirect to data list after deletion
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = "Delete Data"
+        context['search'] = False
+        return context
+
+    # def get_form(self, form_class=None):
+    #     return EditData(instance=self.object)

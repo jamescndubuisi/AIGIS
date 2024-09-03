@@ -5,6 +5,10 @@ from django.utils.translation import gettext_lazy as _
 # Register your models here.
 
 
+class DataAdmin(admin.ModelAdmin):
+    list_display = ('title', 'created', 'updated')
+
+
 class AccountAdmin(UserAdmin):
     ordering = ["id"]
     list_display = (
@@ -73,4 +77,4 @@ class AccountAdmin(UserAdmin):
 
 
 admin.site.register(User, AccountAdmin)
-admin.site.register(Data)
+admin.site.register(Data,DataAdmin)

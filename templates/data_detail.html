@@ -37,7 +37,7 @@
 
 
             <p>Created:   {{ object.created | date:"M d, Y"}} ( about {{ object.created | timesince }} ago )</p>
-                 <p> Updated:  {{ object.modified | date:"M d, Y"}} ( about {{ object.modified | timesince }} ago )</p>
+                 <p> Updated:  {{ object.updated | date:"M d, Y"}} ( about {{ object.updated | timesince }} ago )</p>
              <h4>Description: </h4>
                 <p> {{ object.description | linebreaks }}</p>
         </div>
@@ -117,7 +117,15 @@
     </div>
     
     <div>
-    <p>{{ object.analysis }}</p>
+    {% if object.analysis %}
+        <h3>Analysis</h3>
+        <p>{{ object.analysis }}</p>
+
+    {% endif %}
+    {% if object.prediction %}
+        <h3>Prediction</h3>
+        <p>{{ object.prediction }}</p>
+    {% endif %}
     </div>
 
 {%  endblock %}
