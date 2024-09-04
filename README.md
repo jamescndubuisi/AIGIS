@@ -77,4 +77,4 @@ ALLOWED_HOSTS = ['your_server_domain_or_IP', 'second_domain_or_IP', . . ., 'loca
 ### The rest is just a standard django project deployment
 Checkout the following link for more details:
 https://www.digitalocean.com/community/tutorials/how-to-set-up-django-with-postgres-nginx-and-gunicorn-on-ubuntu
-#### Do not forget to open port 80 and 443 on your server
+#### Do not forget to open port 80 and 443 on your server and turn debug to false
