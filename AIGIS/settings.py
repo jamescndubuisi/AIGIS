@@ -186,3 +186,5 @@ SYNC = False
 # celery -A AIGIS.celery worker -l info -P eventlet
 
 
+
+
